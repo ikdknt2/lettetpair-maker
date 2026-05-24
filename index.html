@@ -1,1 +1,95 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MBLD レターペア登録ツール</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header card">
+        <h1>MBLD レターペア登録ツール</h1>
+        <p class="subtitle">未登録ペアをランダム出題して素早く辞書化</p>
+      </header>
 
+      <nav class="tab-nav card" aria-label="画面切り替え">
+        <button class="tab-btn active" data-tab="main">メイン</button>
+        <button class="tab-btn" data-tab="list">一覧</button>
+        <button class="tab-btn" data-tab="stats">統計</button>
+        <button class="tab-btn" data-tab="json">JSON</button>
+      </nav>
+
+      <main>
+        <section id="tab-main" class="tab-panel active">
+          <div class="card main-card">
+            <div class="counter-block">
+              <p class="label">未登録</p>
+              <p id="unregistered-counter" class="counter-text">380 / 380</p>
+            </div>
+
+            <div id="current-pair" class="current-pair" aria-live="polite">--</div>
+            <p id="all-done" class="all-done hidden">全380ペア登録完了！</p>
+
+            <label for="word-input" class="label">単語</label>
+            <input id="word-input" type="text" maxlength="50" placeholder="例: チーズ" autocomplete="off" />
+
+            <div class="button-row">
+              <button id="register-btn" class="primary">登録</button>
+              <button id="skip-btn" class="secondary">スキップ</button>
+              <button id="next-btn" class="ghost">次へ</button>
+            </div>
+
+            <p id="status-message" class="status" aria-live="polite"></p>
+          </div>
+        </section>
+
+        <section id="tab-list" class="tab-panel">
+          <div class="card">
+            <h2>登録済み一覧</h2>
+            <input id="search-input" type="text" placeholder="pair / word で検索" />
+            <ul id="entries-list" class="entries-list"></ul>
+          </div>
+        </section>
+
+        <section id="tab-stats" class="tab-panel">
+          <div class="card">
+            <h2>統計</h2>
+            <div class="stats-grid">
+              <div>
+                <p class="label">登録数</p>
+                <p id="registered-count" class="stat-value">0</p>
+              </div>
+              <div>
+                <p class="label">未登録数</p>
+                <p id="remaining-count" class="stat-value">380</p>
+              </div>
+              <div>
+                <p class="label">達成率</p>
+                <p id="completion-rate" class="stat-value">0%</p>
+              </div>
+            </div>
+            <div class="progress-wrap" aria-label="進捗バー">
+              <div id="progress-bar" class="progress-bar"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-json" class="tab-panel">
+          <div class="card">
+            <h2>JSON</h2>
+            <div class="button-row">
+              <button id="export-btn" class="primary">エクスポート</button>
+              <label class="file-label secondary" for="import-file">インポート</label>
+              <input id="import-file" type="file" accept="application/json" hidden />
+            </div>
+            <p class="hint">※ インポートは既存データにマージされます（pair単位で上書き）。</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="db.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
