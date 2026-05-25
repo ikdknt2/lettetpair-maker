@@ -46,7 +46,7 @@ alter table public.pair_entries enable row level security;
 -- user_settings table for per-user preferences
 create table if not exists public.user_settings (
   user_id text primary key,
-  mail_opt_in boolean not null default false,
+  id_opt_in boolean not null default false,
   updated_at timestamptz not null default now()
 );
 
