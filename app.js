@@ -47,6 +47,7 @@ init();
 
 async function init() {
   bindEvents();
+  initializeMailOptButton();
   await initCloudAuth(handleAuthChanged);
   await loadEntries();
   pickNextUnregisteredPair();
@@ -367,6 +368,7 @@ async function handleAuthChanged(user, fallbackMessage) {
   }
   const label = user.user_metadata?.preferred_username || user.user_metadata?.full_name || user.id;
   el.authStatus.textContent = `ログイン中: ${label}`;
+  await loadMailOptFromCloud();
 }
 
 async function syncCloud() {
