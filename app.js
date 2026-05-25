@@ -75,12 +75,13 @@ function bindEvents() {
 }
 
 
-function toggleMailOpt() {
+
   const key = "mailOptEnabled";
   const current = localStorage.getItem(key) === "true";
   const next = !current;
   localStorage.setItem(key, String(next));
   el.mailOptBtn.textContent = next ? "Mail Opt: ON" : "Mail Opt: OFF";
+
   setStatus(next ? "Mail Optを有効化しました。" : "Mail Optを無効化しました。");
 }
 
@@ -88,6 +89,7 @@ function initializeMailOptButton() {
   const enabled = localStorage.getItem("mailOptEnabled") === "true";
   el.mailOptBtn.textContent = enabled ? "Mail Opt: ON" : "Mail Opt: OFF";
 }
+
 
 function setTab(tabName) {
   state.activeTab = tabName;
@@ -341,13 +343,14 @@ async function logout() {
   }
 }
 
-function handleAuthChanged(user, fallbackMessage) {
+async function handleAuthChanged(user, fallbackMessage) {
   if (!user) {
     el.authStatus.textContent = fallbackMessage || "未ログイン";
     return;
   }
   const label = user.email || user.user_metadata?.full_name || user.id;
   el.authStatus.textContent = `ログイン中: ${label}`;
+  await loadMailOptFromCloud();
 }
 
 async function syncCloud() {

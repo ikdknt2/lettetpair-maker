@@ -78,3 +78,28 @@ async function pushCloudEntries(entries) {
   if (error) throw error;
 }
 
+
+
+async function pullMailOptSetting() {
+  if (!supabaseClient || !currentUser) return null;
+  const { data, error } = await supabaseClient
+    .from("user_settings")
+    .select("mail_opt_in")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return Boolean(data.mail_opt_in);
+}
+
+async function pushMailOptSetting(enabled) {
+  if (!supabaseClient || !currentUser) return;
+  const { error } = await supabaseClient.from("user_settings").upsert(
+    {
+      user_id: currentUser.id,
+      mail_opt_in: Boolean(enabled)
+    },
+    { onConflict: "user_id" }
+  );
+  if (error) throw error;
+}
