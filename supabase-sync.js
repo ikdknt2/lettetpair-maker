@@ -36,14 +36,29 @@ async function loginWithProvider(provider) {
   if (error) throw error;
 }
 
-async function signupWithEmail(email, password) {
+function toAuthEmail(id) {
+  const normalized = String(id || "").trim().toLowerCase();
+  return `${normalized}@id.local`;
+}
+
+async function signupWithId(id, password) {
   if (!supabaseClient) throw new Error("Cloud not configured");
-  const { error } = await supabaseClient.auth.signUp({ email, password });
+  const normalizedId = String(id || "").trim();
+  if (!normalizedId) throw new Error("IDを入力してください");
+  const email = toAuthEmail(normalizedId);
+  const { error } = await supabaseClient.auth.signUp({
+    email,
+    password,
+    options: { data: { preferred_username: normalizedId } }
+  });
   if (error) throw error;
 }
 
-async function loginWithEmail(email, password) {
+async function loginWithId(id, password) {
   if (!supabaseClient) throw new Error("Cloud not configured");
+  const normalizedId = String(id || "").trim();
+  if (!normalizedId) throw new Error("IDを入力してください");
+  const email = toAuthEmail(normalizedId);
   const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
   if (error) throw error;
 }
@@ -89,5 +104,4 @@ async function pushCloudEntries(entries) {
   const { error } = await supabaseClient.from("pair_entries").upsert(payload, { onConflict: "user_id,pair" });
   if (error) throw error;
 }
-
 
