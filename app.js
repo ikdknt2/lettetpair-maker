@@ -34,10 +34,7 @@ const el = {
   progressBar: document.getElementById("progress-bar"),
   exportBtn: document.getElementById("export-btn"),
   importFile: document.getElementById("import-file"),
-  authEmail: document.getElementById("auth-email"),
-  authPassword: document.getElementById("auth-password"),
-  signupBtn: document.getElementById("signup-btn"),
-  loginBtn: document.getElementById("login-btn"),
+
   logoutBtn: document.getElementById("logout-btn"),
   syncBtn: document.getElementById("sync-btn"),
   authStatus: document.getElementById("auth-status"),
@@ -47,6 +44,7 @@ init();
 
 async function init() {
   bindEvents();
+  initializeMailOptButton();
   await initCloudAuth(handleAuthChanged);
   await loadEntries();
   pickNextUnregisteredPair();
@@ -64,8 +62,7 @@ function bindEvents() {
   el.searchInput.addEventListener("input", renderEntriesList);
   el.exportBtn.addEventListener("click", exportJson);
 
-  el.signupBtn.addEventListener("click", signupWithIdPassword);
-  el.loginBtn.addEventListener("click", loginWithIdPassword);
+
   el.logoutBtn.addEventListener("click", logout);
   el.syncBtn.addEventListener("click", syncCloud);
   el.importFile.addEventListener("change", importJson);
@@ -74,6 +71,7 @@ function bindEvents() {
     if (e.key === "Enter") registerCurrentPair();
   });
 }
+
 
 
 function setTab(tabName) {
@@ -367,6 +365,7 @@ async function handleAuthChanged(user, fallbackMessage) {
   }
   const label = user.email || user.user_metadata?.full_name || user.id;
   el.authStatus.textContent = `ログイン中: ${label}`;
+  await loadMailOptFromCloud();
 }
 
 async function syncCloud() {
