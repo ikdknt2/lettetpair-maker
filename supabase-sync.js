@@ -36,6 +36,18 @@ async function loginWithProvider(provider) {
   if (error) throw error;
 }
 
+async function signupWithEmail(email, password) {
+  if (!supabaseClient) throw new Error("Cloud not configured");
+  const { error } = await supabaseClient.auth.signUp({ email, password });
+  if (error) throw error;
+}
+
+async function loginWithEmail(email, password) {
+  if (!supabaseClient) throw new Error("Cloud not configured");
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+}
+
 async function logoutCloud() {
   if (!supabaseClient) return;
   const { error } = await supabaseClient.auth.signOut();
@@ -77,4 +89,5 @@ async function pushCloudEntries(entries) {
   const { error } = await supabaseClient.from("pair_entries").upsert(payload, { onConflict: "user_id,pair" });
   if (error) throw error;
 }
+
 
