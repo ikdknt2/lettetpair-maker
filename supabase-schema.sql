@@ -1,4 +1,5 @@
 -- pair_entries table for cloud sync
+
 create table if not exists public.pair_entries (
   id uuid primary key default gen_random_uuid(),
   user_id text not null,
@@ -32,19 +33,11 @@ for each row execute function public.set_updated_at();
 
 alter table public.pair_entries enable row level security;
 
-create policy if not exists "Users can read own entries"
-  on public.pair_entries for select
-  using (auth.uid()::text = user_id);
 
-create policy if not exists "Users can insert own entries"
-  on public.pair_entries for insert
-  with check (auth.uid()::text = user_id);
-
-create policy if not exists "Users can update own entries"
   on public.pair_entries for update
   using (auth.uid()::text = user_id)
   with check (auth.uid()::text = user_id);
 
-create policy if not exists "Users can delete own entries"
+
   on public.pair_entries for delete
   using (auth.uid()::text = user_id);

@@ -77,3 +77,4 @@ async function pushCloudEntries(entries) {
   const { error } = await supabaseClient.from("pair_entries").upsert(payload, { onConflict: "user_id,pair" });
   if (error) throw error;
 }
+
