@@ -34,7 +34,10 @@ const el = {
   progressBar: document.getElementById("progress-bar"),
   exportBtn: document.getElementById("export-btn"),
   importFile: document.getElementById("import-file"),
-
+  authId: document.getElementById("auth-id"),
+  authPassword: document.getElementById("auth-password"),
+  signupBtn: document.getElementById("signup-btn"),
+  loginBtn: document.getElementById("login-btn"),
   logoutBtn: document.getElementById("logout-btn"),
   syncBtn: document.getElementById("sync-btn"),
   authStatus: document.getElementById("auth-status"),
@@ -62,7 +65,8 @@ function bindEvents() {
   el.searchInput.addEventListener("input", renderEntriesList);
   el.exportBtn.addEventListener("click", exportJson);
 
-
+  el.signupBtn.addEventListener("click", signupWithIdPassword);
+  el.loginBtn.addEventListener("click", loginWithIdPassword);
   el.logoutBtn.addEventListener("click", logout);
   el.syncBtn.addEventListener("click", syncCloud);
   el.importFile.addEventListener("change", importJson);
@@ -71,7 +75,6 @@ function bindEvents() {
     if (e.key === "Enter") registerCurrentPair();
   });
 }
-
 
 
 function setTab(tabName) {
@@ -318,21 +321,21 @@ async function login(provider) {
 }
 
 function getAuthInput() {
-  const email = (el.authEmail.value || "").trim();
+  const id = (el.authId.value || "").trim();
   const password = el.authPassword.value || "";
-  if (!email || !password) {
-    setStatus("ID（メールアドレス）とパスワードを入力してください。");
+  if (!id || !password) {
+    setStatus("IDとパスワードを入力してください。");
     return null;
   }
-  return { email, password };
+  return { id, password };
 }
 
 async function signupWithIdPassword() {
   const input = getAuthInput();
   if (!input) return;
   try {
-    await signupWithEmail(input.email, input.password);
-    setStatus("ID/PWを登録しました。確認メールが有効な場合はメール確認後にログインしてください。");
+    await signupWithId(input.id, input.password);
+    setStatus("ID/PWを登録しました。");
   } catch (e) {
     setStatus(`ID/PW登録失敗: ${e.message}`);
   }
@@ -342,7 +345,7 @@ async function loginWithIdPassword() {
   const input = getAuthInput();
   if (!input) return;
   try {
-    await loginWithEmail(input.email, input.password);
+    await loginWithId(input.id, input.password);
     setStatus("ID/PWでログインしました。");
   } catch (e) {
     setStatus(`ID/PWログイン失敗: ${e.message}`);
@@ -363,7 +366,7 @@ async function handleAuthChanged(user, fallbackMessage) {
     el.authStatus.textContent = fallbackMessage || "未ログイン";
     return;
   }
-  const label = user.email || user.user_metadata?.full_name || user.id;
+  const label = user.user_metadata?.preferred_username || user.user_metadata?.full_name || user.id;
   el.authStatus.textContent = `ログイン中: ${label}`;
   await loadMailOptFromCloud();
 }

@@ -16,7 +16,13 @@
       <section class="card cloud-card">
         <h2>クラウド同期（任意）</h2>
         <p id="auth-status" class="hint">未ログイン</p>
-
+        <div class="auth-form">
+          <input id="auth-id" type="text" placeholder="ID" autocomplete="username" />
+          <input id="auth-password" type="password" placeholder="パスワード" autocomplete="current-password" />
+        </div>
+        <div class="button-row cloud-actions">
+          <button id="signup-btn" class="secondary">登録</button>
+          <button id="login-btn" class="secondary">ログイン</button>
           <button id="logout-btn" class="ghost">ログアウト</button>
         </div>
         <div class="button-row single">
