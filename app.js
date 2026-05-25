@@ -36,6 +36,7 @@ const el = {
   importFile: document.getElementById("import-file"),
   loginGoogleBtn: document.getElementById("login-google-btn"),
   loginXBtn: document.getElementById("login-x-btn"),
+  mailOptBtn: document.getElementById("mail-opt-btn"),
   logoutBtn: document.getElementById("logout-btn"),
   syncBtn: document.getElementById("sync-btn"),
   authStatus: document.getElementById("auth-status"),
@@ -45,6 +46,7 @@ init();
 
 async function init() {
   bindEvents();
+  initializeMailOptButton();
   await initCloudAuth(handleAuthChanged);
   await loadEntries();
   pickNextUnregisteredPair();
@@ -62,6 +64,7 @@ function bindEvents() {
   el.searchInput.addEventListener("input", renderEntriesList);
   el.exportBtn.addEventListener("click", exportJson);
 
+  el.mailOptBtn.addEventListener("click", toggleMailOpt);
   el.logoutBtn.addEventListener("click", logout);
   el.syncBtn.addEventListener("click", syncCloud);
   el.importFile.addEventListener("change", importJson);
@@ -69,6 +72,45 @@ function bindEvents() {
   el.wordInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") registerCurrentPair();
   });
+}
+
+
+async function toggleMailOpt() {
+  const key = "mailOptEnabled";
+  const current = localStorage.getItem(key) === "true";
+  const next = !current;
+  localStorage.setItem(key, String(next));
+  el.mailOptBtn.textContent = next ? "Mail Opt: ON" : "Mail Opt: OFF";
+
+  if (getCurrentUser()) {
+    try {
+      await pushMailOptSetting(next);
+      setStatus(next ? "Mail Optを有効化しました。（クラウド保存済み）" : "Mail Optを無効化しました。（クラウド保存済み）");
+      return;
+    } catch (e) {
+      setStatus(`Mail Optのクラウド保存に失敗しました: ${e.message}`);
+      return;
+    }
+  }
+
+  setStatus(next ? "Mail Optを有効化しました。" : "Mail Optを無効化しました。");
+}
+
+function initializeMailOptButton() {
+  const enabled = localStorage.getItem("mailOptEnabled") === "true";
+  el.mailOptBtn.textContent = enabled ? "Mail Opt: ON" : "Mail Opt: OFF";
+}
+
+async function loadMailOptFromCloud() {
+  if (!getCurrentUser()) return;
+  try {
+    const cloudValue = await pullMailOptSetting();
+    if (typeof cloudValue !== "boolean") return;
+    localStorage.setItem("mailOptEnabled", String(cloudValue));
+    el.mailOptBtn.textContent = cloudValue ? "Mail Opt: ON" : "Mail Opt: OFF";
+  } catch (e) {
+    setStatus(`Mail Optのクラウド読込に失敗しました: ${e.message}`);
+  }
 }
 
 function setTab(tabName) {
@@ -323,13 +365,14 @@ async function logout() {
   }
 }
 
-function handleAuthChanged(user, fallbackMessage) {
+async function handleAuthChanged(user, fallbackMessage) {
   if (!user) {
     el.authStatus.textContent = fallbackMessage || "未ログイン";
     return;
   }
   const label = user.email || user.user_metadata?.full_name || user.id;
   el.authStatus.textContent = `ログイン中: ${label}`;
+  await loadMailOptFromCloud();
 }
 
 async function syncCloud() {

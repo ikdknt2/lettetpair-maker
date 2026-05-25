@@ -41,3 +41,33 @@ alter table public.pair_entries enable row level security;
 
   on public.pair_entries for delete
   using (auth.uid()::text = user_id);
+
+
+-- user_settings table for per-user preferences
+create table if not exists public.user_settings (
+  user_id text primary key,
+  mail_opt_in boolean not null default false,
+  updated_at timestamptz not null default now()
+);
+
+create trigger trg_user_settings_updated_at
+before update on public.user_settings
+for each row execute function public.set_updated_at();
+
+alter table public.user_settings enable row level security;
+
+drop policy if exists "user_settings_select_own" on public.user_settings;
+create policy "user_settings_select_own"
+  on public.user_settings for select
+  using (auth.uid()::text = user_id);
+
+drop policy if exists "user_settings_insert_own" on public.user_settings;
+create policy "user_settings_insert_own"
+  on public.user_settings for insert
+  with check (auth.uid()::text = user_id);
+
+drop policy if exists "user_settings_update_own" on public.user_settings;
+create policy "user_settings_update_own"
+  on public.user_settings for update
+  using (auth.uid()::text = user_id)
+  with check (auth.uid()::text = user_id);
