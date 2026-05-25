@@ -75,23 +75,12 @@ function bindEvents() {
 }
 
 
-async function toggleMailOpt() {
+
   const key = "mailOptEnabled";
   const current = localStorage.getItem(key) === "true";
   const next = !current;
   localStorage.setItem(key, String(next));
   el.mailOptBtn.textContent = next ? "Mail Opt: ON" : "Mail Opt: OFF";
-
-  if (getCurrentUser()) {
-    try {
-      await pushMailOptSetting(next);
-      setStatus(next ? "Mail Optを有効化しました。（クラウド保存済み）" : "Mail Optを無効化しました。（クラウド保存済み）");
-      return;
-    } catch (e) {
-      setStatus(`Mail Optのクラウド保存に失敗しました: ${e.message}`);
-      return;
-    }
-  }
 
   setStatus(next ? "Mail Optを有効化しました。" : "Mail Optを無効化しました。");
 }
@@ -101,17 +90,6 @@ function initializeMailOptButton() {
   el.mailOptBtn.textContent = enabled ? "Mail Opt: ON" : "Mail Opt: OFF";
 }
 
-async function loadMailOptFromCloud() {
-  if (!getCurrentUser()) return;
-  try {
-    const cloudValue = await pullMailOptSetting();
-    if (typeof cloudValue !== "boolean") return;
-    localStorage.setItem("mailOptEnabled", String(cloudValue));
-    el.mailOptBtn.textContent = cloudValue ? "Mail Opt: ON" : "Mail Opt: OFF";
-  } catch (e) {
-    setStatus(`Mail Optのクラウド読込に失敗しました: ${e.message}`);
-  }
-}
 
 function setTab(tabName) {
   state.activeTab = tabName;
