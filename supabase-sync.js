@@ -36,6 +36,18 @@ async function loginWithProvider(provider) {
   if (error) throw error;
 }
 
+async function signupWithEmail(email, password) {
+  if (!supabaseClient) throw new Error("Cloud not configured");
+  const { error } = await supabaseClient.auth.signUp({ email, password });
+  if (error) throw error;
+}
+
+async function loginWithEmail(email, password) {
+  if (!supabaseClient) throw new Error("Cloud not configured");
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+}
+
 async function logoutCloud() {
   if (!supabaseClient) return;
   const { error } = await supabaseClient.auth.signOut();
@@ -79,27 +91,3 @@ async function pushCloudEntries(entries) {
 }
 
 
-
-async function pullMailOptSetting() {
-  if (!supabaseClient || !currentUser) return null;
-  const { data, error } = await supabaseClient
-    .from("user_settings")
-    .select("mail_opt_in")
-    .eq("user_id", currentUser.id)
-    .maybeSingle();
-  if (error) throw error;
-  if (!data) return null;
-  return Boolean(data.mail_opt_in);
-}
-
-async function pushMailOptSetting(enabled) {
-  if (!supabaseClient || !currentUser) return;
-  const { error } = await supabaseClient.from("user_settings").upsert(
-    {
-      user_id: currentUser.id,
-      mail_opt_in: Boolean(enabled)
-    },
-    { onConflict: "user_id" }
-  );
-  if (error) throw error;
-}

@@ -34,9 +34,7 @@ const el = {
   progressBar: document.getElementById("progress-bar"),
   exportBtn: document.getElementById("export-btn"),
   importFile: document.getElementById("import-file"),
-  loginGoogleBtn: document.getElementById("login-google-btn"),
-  loginXBtn: document.getElementById("login-x-btn"),
-  mailOptBtn: document.getElementById("mail-opt-btn"),
+
   logoutBtn: document.getElementById("logout-btn"),
   syncBtn: document.getElementById("sync-btn"),
   authStatus: document.getElementById("auth-status"),
@@ -64,7 +62,7 @@ function bindEvents() {
   el.searchInput.addEventListener("input", renderEntriesList);
   el.exportBtn.addEventListener("click", exportJson);
 
-  el.mailOptBtn.addEventListener("click", toggleMailOpt);
+
   el.logoutBtn.addEventListener("click", logout);
   el.syncBtn.addEventListener("click", syncCloud);
   el.importFile.addEventListener("change", importJson);
@@ -74,21 +72,6 @@ function bindEvents() {
   });
 }
 
-
-
-  const key = "mailOptEnabled";
-  const current = localStorage.getItem(key) === "true";
-  const next = !current;
-  localStorage.setItem(key, String(next));
-  el.mailOptBtn.textContent = next ? "Mail Opt: ON" : "Mail Opt: OFF";
-
-  setStatus(next ? "Mail Optを有効化しました。" : "Mail Optを無効化しました。");
-}
-
-function initializeMailOptButton() {
-  const enabled = localStorage.getItem("mailOptEnabled") === "true";
-  el.mailOptBtn.textContent = enabled ? "Mail Opt: ON" : "Mail Opt: OFF";
-}
 
 
 function setTab(tabName) {
@@ -331,6 +314,38 @@ async function login(provider) {
     await loginWithProvider(provider);
   } catch (e) {
     setStatus(`ログイン失敗: ${e.message}`);
+  }
+}
+
+function getAuthInput() {
+  const email = (el.authEmail.value || "").trim();
+  const password = el.authPassword.value || "";
+  if (!email || !password) {
+    setStatus("ID（メールアドレス）とパスワードを入力してください。");
+    return null;
+  }
+  return { email, password };
+}
+
+async function signupWithIdPassword() {
+  const input = getAuthInput();
+  if (!input) return;
+  try {
+    await signupWithEmail(input.email, input.password);
+    setStatus("ID/PWを登録しました。確認メールが有効な場合はメール確認後にログインしてください。");
+  } catch (e) {
+    setStatus(`ID/PW登録失敗: ${e.message}`);
+  }
+}
+
+async function loginWithIdPassword() {
+  const input = getAuthInput();
+  if (!input) return;
+  try {
+    await loginWithEmail(input.email, input.password);
+    setStatus("ID/PWでログインしました。");
+  } catch (e) {
+    setStatus(`ID/PWログイン失敗: ${e.message}`);
   }
 }
 
