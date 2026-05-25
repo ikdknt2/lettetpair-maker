@@ -61,8 +61,7 @@ function bindEvents() {
   el.nextBtn.addEventListener("click", pickNextUnregisteredPairAndRender);
   el.searchInput.addEventListener("input", renderEntriesList);
   el.exportBtn.addEventListener("click", exportJson);
-  el.loginGoogleBtn.addEventListener("click", () => login("github"));
-  el.loginXBtn.addEventListener("click", loginWithEmailPrompt);
+
   el.logoutBtn.addEventListener("click", logout);
   el.syncBtn.addEventListener("click", syncCloud);
   el.importFile.addEventListener("change", importJson);

@@ -78,12 +78,3 @@ async function pushCloudEntries(entries) {
   if (error) throw error;
 }
 
-
-async function loginWithEmailOtp(email) {
-  if (!supabaseClient) throw new Error("Cloud not configured");
-  const { error } = await supabaseClient.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: window.location.href }
-  });
-  if (error) throw error;
-}
